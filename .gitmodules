@@ -1,0 +1,3 @@
+[submodule "lib/pymsb"]
+	path = lib/pymsb
+	url = https://github.com/SunakazeKun/pymsb
