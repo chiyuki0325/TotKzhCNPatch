@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 # 《塞尔达传说：王国之泪》汉化优化补丁
 
@@ -25,7 +26,8 @@ REPLACEMENTS_PATH: Path = Path('./replacements/default_replacements.yml')
 # 来自游戏本体的二进制文件
 ZSTD_DICT_PATH: Path = Path('./binaries/zs.zsdic')  # 从 pack 文件中解包
 DEFAULT_ZSDIC_PACK_PATH = Path('./binaries/romfs/Pack/ZsDic.pack.zs')
-DEFAULT_RSIZETABLE_PATH: Path = Path(f'./binaries/romfs/System/Resource/ResourceSizeTable.Product.{version}.rsizetable.zs')
+DEFAULT_RSIZETABLE_PATH: Path = Path(
+    f'./binaries/romfs/System/Resource/ResourceSizeTable.Product.{version}.rsizetable.zs')
 DEFAULT_FONT_PATH = Path('./binaries/romfs/Font/Font_CNzh.Nin_NX_NVN.bfarc.zs')
 DEFAULT_MESSAGE_PACK_PATH = Path(f'./binaries/romfs/Mals/CNzh.Product.{version}.sarc.zs')
 
@@ -122,8 +124,9 @@ if not dest_message_pack_path.exists():
     print('')
 
     print('正在汉化字符串...')
-    with open(REPLACEMENTS_PATH, "r") as f:
-        replacements: dict[str, str] = yaml.safe_load(f)
+    with open(REPLACEMENTS_PATH, "rb") as f:
+        yaml_str: str = f.read().decode('utf-8')
+        replacements: dict[str, str] = yaml.safe_load(yaml_str)
     print(replacements)
     for file in unpacked_messages_dir.glob('**/*.msbt'):
         print('-', file.relative_to(unpacked_messages_dir))
