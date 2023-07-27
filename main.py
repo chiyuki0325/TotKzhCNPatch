@@ -158,7 +158,6 @@ dist_romfs_dir.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.rename(dist_romfs_dir)
 
 shutil.rmtree(WORKING_DIR)
-shutil.rmtree(OUTPUT_DIR)
 
 print('补丁生成完毕！')
 print('请将 "dist/汉化优化补丁" 文件夹复制到模拟器的 mod 目录。')
