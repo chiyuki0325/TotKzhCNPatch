@@ -12,16 +12,22 @@ from lib.msbt_wrapper import MSBT
 from lib.hash import compute_crc32
 from lib import sarc_tool
 
+print('获取游戏版本...')
+file_name = list(Path('.').glob('./binaries/romfs/Mals/CNzh.Product.*.sarc.zs'))[0].name
+version = file_name.split('.sarc.zs')[0].split('.')[-1]
+print('游戏版本:', version)
+print('')
+
 # 补丁文件
 FONT_PATCH_PATH: Path = Path('./patches/Font_CNzh.Nin_NX_NVN.bfarc.xdelta')
 REPLACEMENTS_PATH: Path = Path('./replacements/default_replacements.yml')
 
 # 来自游戏本体的二进制文件
-ZSTD_DICT_PATH: Path = Path('./binaries/zs.zsdic')
+ZSTD_DICT_PATH: Path = Path('./binaries/zs.zsdic')  # 从 pack 文件中解包
 DEFAULT_ZSDIC_PACK_PATH = Path('./binaries/romfs/Pack/ZsDic.pack.zs')
-DEFAULT_RSIZETABLE_PATH: Path = Path('./binaries/romfs/System/Resource/ResourceSizeTable.Product.110.rsizetable.zs')
+DEFAULT_RSIZETABLE_PATH: Path = Path(f'./binaries/romfs/System/Resource/ResourceSizeTable.Product.{version}.rsizetable.zs')
 DEFAULT_FONT_PATH = Path('./binaries/romfs/Font/Font_CNzh.Nin_NX_NVN.bfarc.zs')
-DEFAULT_MESSAGE_PACK_PATH = Path('./binaries/romfs/Mals/CNzh.Product.110.sarc.zs')
+DEFAULT_MESSAGE_PACK_PATH = Path(f'./binaries/romfs/Mals/CNzh.Product.{version}.sarc.zs')
 
 # 文件夹
 OUTPUT_DIR: Path = Path('./output')
@@ -51,18 +57,18 @@ if not ZSTD_DICT_PATH.exists():
 
 # 资源表
 
-dest_rsizetable_path: Path = OUTPUT_DIR / 'System/Resource/ResourceSizeTable.Product.110.rsizetable.zs'
+dest_rsizetable_path: Path = OUTPUT_DIR / f'System/Resource/ResourceSizeTable.Product.{version}.rsizetable.zs'
 if not dest_rsizetable_path.exists():
 
     print('正在解压资源表...')
-    unpacked_rsizetable_path: Path = WORKING_DIR / 'ResourceSizeTable.Product.110.rsizetable'
+    unpacked_rsizetable_path: Path = WORKING_DIR / f'ResourceSizeTable.Product.{version}.rsizetable'
     run_command(['zstd', '-d', DEFAULT_RSIZETABLE_PATH, '-o', unpacked_rsizetable_path])
     print('')
 
     print('正在扩容资源表...')
     rsizetable: RESTBL = RESTBL.from_binary_data(unpacked_rsizetable_path.read_bytes())
     for item in [
-        'Mals/CNzh.Product.110.sarc',
+        f'Mals/CNzh.Product.{version}.sarc',
         'Font/Font_CNzh.Nin_NX_NVN.bfarc'
     ]:
         item_hash: int = compute_crc32(item)
@@ -102,10 +108,10 @@ if not dest_font_path.exists():
 
 # 字符串
 
-dest_message_pack_path: Path = OUTPUT_DIR / 'Mals/CNzh.Product.110.sarc.zs'
+dest_message_pack_path: Path = OUTPUT_DIR / f'Mals/CNzh.Product.{version}.sarc.zs'
 if not dest_message_pack_path.exists():
     print('正在解压字符串包...')
-    unpacked_message_pack_path: Path = WORKING_DIR / 'CNzh.Product.110.sarc'
+    unpacked_message_pack_path: Path = WORKING_DIR / f'CNzh.Product.{version}.sarc'
     run_command(['zstd', '-D', ZSTD_DICT_PATH, '-d', DEFAULT_MESSAGE_PACK_PATH, '-o', unpacked_message_pack_path])
     unpacked_messages_dir: Path = WORKING_DIR / 'messages'
     sarc_tool.extract(
@@ -139,7 +145,7 @@ if not dest_message_pack_path.exists():
     print('')
 
     print('正在打包字符串包...')
-    packed_message_pack_path: Path = WORKING_DIR / 'CNzh.Product.110.sarc'
+    packed_message_pack_path: Path = WORKING_DIR / f'CNzh.Product.{version}.sarc'
     sarc_tool.pack(
         root=unpacked_messages_dir.__str__(),
         endianness='<',  # Switch 是小端序
