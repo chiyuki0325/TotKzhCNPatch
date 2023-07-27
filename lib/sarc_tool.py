@@ -33,6 +33,7 @@ except ImportError:
     ans = input("Do you want to install it now? (y/n)\t")
     if ans.lower() == 'y':
         import pip
+
         pip.main(['install', 'SarcLib==0.3'])
         del pip
 
@@ -49,6 +50,7 @@ except ImportError:
     ans = input("Do you want to install it now? (y/n)\t")
     if ans.lower() == 'y':
         import pip
+
         pip.main(['install', 'libyaz0==0.5'])
         del pip
 
@@ -58,7 +60,7 @@ except ImportError:
         sys.exit(1)
 
 
-def extract(file):
+def extract(file, root: str | None = None):
     """
     Extrct the given archive
     """
@@ -79,7 +81,8 @@ def extract(file):
         arc = SarcLib.SARC_Archive()
         arc.load(inb)
 
-        root = os.path.join(os.path.dirname(file), name)
+        if root is None:
+            root = os.path.join(os.path.dirname(file), name)
         if not os.path.isdir(root):
             os.mkdir(root)
 
@@ -112,7 +115,7 @@ def extract(file):
                 getAbsPath(checkObj, checkObj.name)
 
         for file, fileData in files:
-            print(file)
+            print('-', file)
             with open(os.path.join(root, file), "wb") as out:
                 out.write(fileData)
 
@@ -150,7 +153,7 @@ def pack(root, endianness, level, outname):
             else:
                 filename = file
 
-            print(filename)
+            print('-', filename)
 
             fullname = ''.join([root, "/", filename])
 
@@ -160,7 +163,9 @@ def pack(root, endianness, level, outname):
                     exec("folder%i = SarcLib.Folder(folder + '/'); arc.addFolder(folder%i)".replace('%i', str(i)))
 
                 else:
-                    exec("folder%i = SarcLib.Folder(folder + '/'); folder%m.addFolder(folder%i)".replace('%i', str(i)).replace('%m', str(i - 1)))
+                    exec("folder%i = SarcLib.Folder(folder + '/'); folder%m.addFolder(folder%i)".replace('%i',
+                                                                                                         str(i)).replace(
+                        '%m', str(i - 1)))
 
                 i += 1
 
@@ -253,5 +258,6 @@ def main():
         print("\nExiting in 5 seconds...")
         time.sleep(5)
         sys.exit(1)
+
 
 if __name__ == '__main__': main()

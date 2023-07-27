@@ -7,3 +7,8 @@ __pycache__/
 
 *.pyc
 **/*.pyc
+
+binaries/*
+output/*
+dist/*
+working/*
