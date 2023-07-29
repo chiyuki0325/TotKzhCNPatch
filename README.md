@@ -16,7 +16,7 @@
 
 ### 如何使用
 
-本补丁理论上适用于所有版本的游戏，已经在 1.0.0 和 1.1.0 上测试通过。
+本补丁理论上适用于所有版本的游戏，已经在 1.0.0 1.1.0 和 1.2.0上测试通过。
 
 为规避版权风险，本补丁需要你自行提供游戏的 romfs 文件，之后在 romfs 之上打补丁，生成一个 mod。romfs 可以从模拟器或 NS 自制系统中解包。
 
@@ -39,3 +39,11 @@ python3 main.py
 ```
 
 待补丁操作完成后，你可以在 dist 目录中找到“汉化优化补丁”文件夹，把它放到模拟器的 mod 数据文件夹中，就可以在游戏中看到汉化效果了。
+
+### 如何在破解的 Switch 上使用
+
+补丁可以在破解的 Switch 上使用。你需要更新到 [atmosphere](https://github.com/Atmosphere-NX/Atmosphere) 的最新版本。
+
+这里使用 [DBI](https://github.com/rashevskyv/dbi) 来操作。首先，在 hbmenu 启动 DBI ，以 DBI551-en 为例，选择 `Browse installed applications` - `塞尔达传说 王国之泪` - `Application` - 对着 `romfs` 文件夹按下+，copy 出来，同上面的使用方法，运行脚本。
+
+接着 将其放入 `SD卡/atmosphere/contents/0100F2C0115B6000/romfs` 下，启动游戏，enjoy。
