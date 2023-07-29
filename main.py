@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # 《塞尔达传说：王国之泪》汉化优化补丁
+# 当前版本:
+PATCH_VERSION: str = '20230729-4'
 
 import yaml
 from pathlib import Path
@@ -164,7 +166,9 @@ if not dest_message_pack_path.exists():
 
 dist_dir: Path = Path('./dist')
 
-dist_romfs_dir: Path = dist_dir / '汉化优化补丁/romfs'
+folder_name: str = '汉化优化补丁 ' + PATCH_VERSION + ' (' + game_version + ')'
+
+dist_romfs_dir: Path = dist_dir / f'{folder_name}/romfs'
 dist_romfs_dir.mkdir(parents=True, exist_ok=True)
 
 OUTPUT_DIR.rename(dist_romfs_dir)
@@ -172,4 +176,4 @@ OUTPUT_DIR.rename(dist_romfs_dir)
 shutil.rmtree(WORKING_DIR)
 
 print('补丁生成完毕！')
-print('请将 "dist/汉化优化补丁" 文件夹复制到模拟器的 mod 目录。')
+print(f'请将 "dist/{folder_name}" 文件夹复制到模拟器的 mod 目录。')
