@@ -26,6 +26,12 @@
 
 以 Yuzu 模拟器为例，在模拟器的主菜单对《塞尔达传说：王国之泪》点击右键。选择“转储 RomFS”->“转储 RomFS”，点击确定，等待转储完成后，会打开生成的 romfs 文件夹。
 
+如果是 NS 上玩的，可以只用 DBI 导出这几个文件，这样就省点时间：
+- romfs/Pack/ZsDic.pack.zs
+- romfs/System/Resource/ResourceSizeTable.Product.(游戏版本号，比如 110).rsizetable.zs
+- romfs/Font/Font_CNzh.Nin_NX_NVN.bfarc.zs
+- romfs/Mals/CNzh.Product.110.sarc.zs
+
 在项目文件夹下创建名为 binaries 的文件夹，把这个 romfs 文件夹移动到其中，然后在命令行中执行以下命令：
 
 ```bash
