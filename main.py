@@ -3,7 +3,7 @@
 
 # 《塞尔达传说：王国之泪》汉化优化补丁
 # 当前版本:
-PATCH_VERSION: str = '20230805-1'
+PATCH_VERSION: str = '20230809-1'
 
 import yaml
 from pathlib import Path
