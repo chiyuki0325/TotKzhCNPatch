@@ -3,17 +3,47 @@
 
 # 《塞尔达传说：王国之泪》汉化优化补丁
 # 当前版本:
-PATCH_VERSION: str = '20230809-1'
+PATCH_VERSION: str = '20230810-1'
 
 import yaml
 from pathlib import Path
 from subprocess import run as run_command
 import shutil
+import os
 
 from lib.restbl import RESTBL
 from lib.msbt_wrapper import MSBT
 from lib.hash import compute_crc32
 from lib import sarc_tool
+
+os.putenv('PYTHONUNBUFFERED', '1')
+
+print('《塞尔达传说：王国之泪》汉化优化补丁')
+print('版本:', PATCH_VERSION)
+print('By 是一刀斩哒')
+print('https://github.com/YidaozhanYa/TotKzhCNPatch')
+print('')
+print('--------------------------------------------')
+print('')
+
+# 询问是否使用额外补丁
+print('在打补丁之前，请选择是否替换如下的条目:')
+print('这些条目为日文原文的变动，导致中文名发生了变化。')
+print('如果你想使用这些译名，请输入 "y"。')
+print('如果你想使用原版译名，请直接按回车。')
+print('')
+for item in [
+    ['王国之泪', '旷野之息:'],
+    ['初始之剑', '长剑'],
+    ['海风盾', '勇者盾'],
+    ['天空的白刃剑', '女神的白刃剑'],
+    ['异次元恶灵套装', '幻影盖侬套装']
+]:
+    print(item[0], '->', item[1])
+if input('> ').lower().strip()[0] == 'y':
+    use_additional_replacements: bool = True
+else:
+    use_additional_replacements: bool = False
 
 print('获取游戏版本...')
 file_name = list(Path('.').glob('./binaries/romfs/Mals/CNzh.Product.*.sarc.zs'))[0].name
@@ -26,7 +56,8 @@ print('')
 
 # 补丁文件
 FONT_PATCH_PATH: Path = Path('./patches/Font_CNzh.Nin_NX_NVN.bfarc.xdelta')
-REPLACEMENTS_PATH: Path = Path('./replacements/default_replacements.yml')
+DEFAULT_REPLACEMENTS_PATH: Path = Path('./replacements/default.yml')
+ADDITIONAL_REPLACEMENTS_PATH: Path = Path('./replacements/additional.yml')
 
 # 来自游戏本体的二进制文件
 ZSTD_DICT_PATH: Path = Path('./binaries/zs.zsdic')  # 从 pack 文件中解包
@@ -129,28 +160,37 @@ if not dest_message_pack_path.exists():
     print('')
 
     print('正在汉化字符串...')
-    with open(REPLACEMENTS_PATH, "rb") as f:
-        yaml_str: str = f.read().decode('utf-8')
-        replacements: dict[str, str] = yaml.safe_load(yaml_str)
-    print(replacements)
-    for file in unpacked_messages_dir.glob('**/*.msbt'):
-        print('-', file.relative_to(unpacked_messages_dir))
-        msbt: MSBT = MSBT(file)
-        this_file_replacements_count: int = 0
-        for i in range(len(msbt.texts)):
-            original_text: str = msbt.texts[i]
-            new_text: str = original_text
-            for original, replacement in replacements.items():
-                new_text = new_text.replace(original, replacement)
-            if original_text != new_text:
-                print('  ID:', msbt.labels[i].name)
-                print('  原始:', original_text)
-                print('  订正:', new_text)
-                this_file_replacements_count += 1
-                msbt.texts[i] = new_text
-        if this_file_replacements_count != 0:
-            msbt.save(file)
-    print('')
+
+    replacement_files: list[Path] = [
+        DEFAULT_REPLACEMENTS_PATH
+    ]
+    if use_additional_replacements:
+        replacement_files.append(ADDITIONAL_REPLACEMENTS_PATH)
+        print('(使用额外补丁)')
+
+    for replacement_file in replacement_files:
+        with open(replacement_file, "rb") as f:
+            yaml_str: str = f.read().decode('utf-8')
+            replacements: dict[str, str] = yaml.safe_load(yaml_str)
+        print(replacements)
+        for file in unpacked_messages_dir.glob('**/*.msbt'):
+            print('-', file.relative_to(unpacked_messages_dir))
+            msbt: MSBT = MSBT(file)
+            this_file_replacements_count: int = 0
+            for i in range(len(msbt.texts)):
+                original_text: str = msbt.texts[i]
+                new_text: str = original_text
+                for original, replacement in replacements.items():
+                    new_text = new_text.replace(original, replacement)
+                if original_text != new_text:
+                    print('  ID:', msbt.labels[i].name)
+                    print('  原始:', original_text)
+                    print('  订正:', new_text)
+                    this_file_replacements_count += 1
+                    msbt.texts[i] = new_text
+            if this_file_replacements_count != 0:
+                msbt.save(file)
+        print('')
 
     print('正在打包字符串包...')
     packed_message_pack_path: Path = WORKING_DIR / f'CNzh.Product.{messages_version}.sarc'
@@ -167,6 +207,8 @@ if not dest_message_pack_path.exists():
 dist_dir: Path = Path('./dist')
 
 folder_name: str = '汉化优化补丁 ' + PATCH_VERSION + ' (' + game_version + ')'
+if use_additional_replacements:
+    folder_name += ' (FULL)'
 
 dist_romfs_dir: Path = dist_dir / f'{folder_name}/romfs'
 dist_romfs_dir.mkdir(parents=True, exist_ok=True)
