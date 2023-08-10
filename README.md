@@ -6,6 +6,8 @@
 
 本补丁旨在修复上述问题，使游戏内的译名与《旷野之息》保持一致，同时统一中英文字体，并且修复部分错误翻译，让《旷野之息》的老玩家能够更好地适应本作。
 
+本补丁分标准版和完全版两个版本，完全版还把一些王国之泪日文原文就更改的名称（如幻影盖侬套装 -> 异次元恶灵套装）修改回旧名称。
+
 当前版本: **20230810-1**
 
 ### 预览
@@ -20,33 +22,52 @@
 
 本补丁理论上适用于所有版本的游戏，已经在 1.0.0 1.1.0 和 1.2.0上测试通过。
 
-为规避版权风险，本补丁需要你自行提供游戏的 romfs 文件，之后在 romfs 之上打补丁，生成一个 mod。romfs 可以从模拟器或 NS 自制系统中解包。
+1、安装 [msys2](https://www.msys2.org)。
 
-首先，你需要安装 Python 3.10 或以上版本，之后获取《塞尔达传说：王国之泪》的 romfs 文件夹。
+2、获取《塞尔达传说：王国之泪》的 romfs 文件夹。romfs 可以从模拟器或 NS 破解系统中解包。
 
-以 Yuzu 模拟器为例，在模拟器的主菜单对《塞尔达传说：王国之泪》点击右键。选择“转储 RomFS”->“转储 RomFS”，点击确定，等待转储完成后，会打开生成的 romfs 文件夹。
+- 如果使用 Yuzu 模拟器，则在模拟器的主菜单对《塞尔达传说：王国之泪》点击右键。选择“转储 RomFS”->“转储 RomFS”，点击确定，等待转储完成后，会打开生成的 romfs 文件夹。
 
-如果是 NS 上玩的，可以只用 DBI 导出这几个文件，这样就省点时间：
-- romfs/Pack/ZsDic.pack.zs
-- romfs/System/Resource/ResourceSizeTable.Product.(游戏版本号，比如 110).rsizetable.zs
-- romfs/Font/Font_CNzh.Nin_NX_NVN.bfarc.zs
-- romfs/Mals/CNzh.Product.110.sarc.zs
+- 如果是 NS 上玩的，可以用 DBI 导出这几个文件：
 
-在项目文件夹下创建名为 binaries 的文件夹，把这个 romfs 文件夹移动到其中，然后在命令行中执行以下命令：
+  - romfs/Pack/ZsDic.pack.zs
+  - romfs/System/Resource/ResourceSizeTable.Product.(游戏版本号，比如 110).rsizetable.zs
+  - romfs/Font/Font_CNzh.Nin_NX_NVN.bfarc.zs
+  - romfs/Mals/CNzh.Product.110.sarc.zs
+
+3、打开 msys2 并执行以下命令。
 
 ```bash
-# 创建并激活 Python 虚拟环境
-python3 -m venv venv
-source venv/bin/activate
+# 安装所需要的软件包
+pacman -Syu git python python-pip zstd xdelta3 --needed
 
-# 安装依赖
+# 克隆补丁项目
+cd "$USERPROFILE/Downloads"
+git clone https://github.com/YidaozhanYa/TotKzhCNPatch.git
+cd TotKzhCNPatch
+
+# 创建 Python 虚拟环境并安装依赖
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 
+# 放入 romfs 文件夹
+mkdir -p binaries
+# 之后把 romfs 文件夹放入“资源管理器左侧「下载」文件夹”->“TotKzhCNPatch”->“binaries”中
+
 # 执行补丁
-python3 main.py
+python main.py
+# 此时可以选择打标准版还是完全版
+# 打好的补丁位于“资源管理器左侧「下载」文件夹”->“TotKzhCNPatch”->“dist”中
+# 之后可以删除 TotKzhCNPatch 文件夹
 ```
 
-待补丁操作完成后，你可以在 dist 目录中找到“汉化优化补丁”文件夹，把它放到模拟器的 mod 数据文件夹中，就可以在游戏中看到汉化效果了。
+待补丁操作完成后，你可以在 *dist* 目录中找到“*汉化优化补丁*”文件夹。
+打好的补丁是 LayeredFS 格式。
+
+### 如何在模拟器上使用
+
+ 如果你使用模拟器游玩，就把它放到模拟器的 mod 数据文件夹中，就可以在游戏中看到汉化效果了。
 
 ### 如何在破解的 Switch 上使用
 
